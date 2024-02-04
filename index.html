@@ -6,20 +6,30 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tic Tac Toe</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <style>
-        * {
-            background-color: black;
-            color: white;
+        /* Ensure the body fills the entire viewport */
+        body {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
+            background-color: #121212;
+            /* Set background color to black */
             font-family: Arial, sans-serif;
+            color: white;
+            /* Set text color to white for visibility */
+            position: relative;
+            /* Set position to relative to contain absolutely positioned elements */
+            width: 100vw;
+            height: 100vh;
+            /* Cover entire viewport */
         }
 
+        /* Your other styles here */
         .container {
+            position: relative;
+            /* Set position to relative to contain absolutely positioned elements */
+            z-index: 1;
+            /* Ensure the container stays above the background */
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
@@ -34,6 +44,10 @@
             font-size: 100px;
             margin-bottom: 20px;
             margin-top: 50px;
+            z-index: 2;
+            /* Set higher z-index to appear above the 3D model */
+            position: relative;
+            /* Ensure z-index works properly */
         }
 
         p {
@@ -58,6 +72,10 @@
         .game-mode-buttons {
             text-align: center;
             margin-top: 20px;
+            z-index: 2;
+            /* Set higher z-index to appear above the 3D model */
+            position: relative;
+            /* Ensure z-index works properly */
         }
 
         .game-mode-buttons button {
@@ -76,19 +94,31 @@
         }
 
         .model-container {
-            width: 300px;
-            height: 300px;
-            background-color: #333333;
-            /* Placeholder color */
-            border-radius: 10px;
+            position: absolute;
+            /* Position the container absolutely */
+            top: 0;
+            /* Align to the top of the page */
+            left: 0;
+            /* Align to the left of the page */
+            width: 100vw;
+            /* Occupy the entire viewport width */
+            height: 100vh;
+            /* Occupy the entire viewport height */
+            z-index: 0;
+            /* Set a lower z-index to appear as the background */
+        }
+
+        /* Hide the element containing the "Move your mouse" text */
+        .model-container .overlay {
+            display: none;
         }
 
         @media (max-width: 768px) {
-            h1{
+            h1 {
                 font-size: 55px;
             }
 
-            p{
+            p {
                 font-size: 17px;
             }
 
@@ -110,35 +140,56 @@
                 margin-top: 20px;
             }
         }
+
+        /* Adjust the position and styling of "Wanna Play choose any one!!" text */
+        h3 {
+            margin-top: 20px;
+            color: #ffffff;
+            font-size: 24px;
+            z-index: 2;
+            position: relative;
+        }
     </style>
 </head>
 
 <body>
-    <h1 align="center">Tic Tac Toe</h1>
+    <h1 class="animate__animated animate__lightSpeedInLeft" align="center">Tic Tac Toe</h1>
     <div class="container">
-        <div class="content">
-            <p>Tic Tac Toe is a classic game played by two players, traditionally using X and O symbols on a 3x3 grid.
-                The
-                objective is to be the first player to form a horizontal, vertical, or diagonal line with their symbol.
-            </p>
-            <p>The game is simple yet challenging and is often used to teach basic strategy and critical thinking
-                skills.
-                It's popular among all age groups and can be played both casually and competitively.</p>
-            <p>With its straightforward rules and quick gameplay, Tic Tac Toe remains a timeless favorite in the world
-                of
-                games and puzzles.</p>
-            <br />
-            <br />
-            <br />
+        <div class="content animate__animated animate__fadeIn">
+            <ul>
+                <li>
+                    <p>Tic Tac Toe is a classic game played by two players, traditionally using X and O symbols on a 3x3
+                        grid.
+                        The
+                        objective is to be the first player to form a horizontal, vertical, or diagonal line with their
+                        symbol.
+                    </p>
+                    <br />
+                </li>
+                <li>
+                    <p>The game is simple yet challenging and is often used to teach basic strategy and critical
+                        thinking
+                        skills.
+                        It's popular among all age groups and can be played both casually and competitively.</p>
+                    <br />
+                </li>
+                <li>
+                    <p>With its straightforward rules and quick gameplay, Tic Tac Toe remains a timeless favorite in the
+                        world
+                        of
+                        games and puzzles.</p>
+                    <br />
+                </li>
+            </ul>
         </div>
-        <div class="model-container">
-            <model-viewer src="./3d models/tic_tac_toe.glb" alt="Your 3D Model" auto-rotate camera-controls></model-viewer>
-        </div>
-
     </div>
-    <br/>
-    <br/>
-    <br/>
+    <div class="model-container">
+        <script type="module" src="https://unpkg.com/@splinetool/viewer@1.0.47/build/spline-viewer.js"></script>
+        <spline-viewer url="https://prod.spline.design/IKyqTPuLOmPiCfIQ/scene.splinecode"></spline-viewer>
+    </div>
+    <br />
+    <br />
+    <br />
     <h3 align="center">Wanna Play choose any one!!</h3>
     <div class="game-mode-buttons">
         <button onclick="startGame('playerVsPlayer')">Player vs Player</button>
