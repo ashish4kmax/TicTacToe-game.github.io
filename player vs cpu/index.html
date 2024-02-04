@@ -356,6 +356,36 @@
             leaderboardElement.innerHTML = '';
 
             // Loop through the sorted leaderboardData array and render each item with animation
+            leaderboardData.slice(0, 5).forEach(function (item, index) {
+                var tupleElement = document.createElement('p');
+                tupleElement.textContent = (index + 1) + '. ' + item.playerID + ': ' + item.score;
+                tupleElement.classList.add('leaderboard-tuple', 'animate-slide-in');
+                setTimeout(() => {
+                    leaderboardElement.appendChild(tupleElement);
+                }, 100 * index);
+            });
+
+            // Add a button to show more players
+            if (leaderboardData.length > 5) {
+                var showMoreButton = document.createElement('button');
+                showMoreButton.textContent = 'Show More';
+                showMoreButton.classList.add('button-85');
+                showMoreButton.onclick = function () {
+                    renderAllLeaderboard(leaderboardData);
+                };
+                leaderboardElement.appendChild(showMoreButton);
+            }
+        }
+
+        // Function to render all leaderboard items
+        function renderAllLeaderboard(leaderboardData) {
+            var leaderboardElement = document.querySelector('.leaderboard');
+            leaderboardElement.innerHTML = '<h3>Leaderboard</h3>';
+
+            // Sort the leaderboardData array based on the score in descending order
+            leaderboardData.sort((a, b) => b.score - a.score);
+
+            // Loop through the sorted leaderboardData array and render each item with animation
             leaderboardData.forEach(function (item, index) {
                 var tupleElement = document.createElement('p');
                 tupleElement.textContent = (index + 1) + '. ' + item.playerID + ': ' + item.score;
@@ -365,6 +395,7 @@
                 }, 100 * index);
             });
         }
+
 
 
 
