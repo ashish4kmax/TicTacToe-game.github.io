@@ -356,24 +356,31 @@
             leaderboardElement.innerHTML = '';
 
             // Loop through the sorted leaderboardData array and render each item with animation
-            leaderboardData.slice(0, 5).forEach(function (item, index) {
+            var maxToShow = 5;
+            for (var i = 0; i < maxToShow; i++) {
+                var item = leaderboardData[i];
+                if (!item) break;
                 var tupleElement = document.createElement('p');
-                tupleElement.textContent = (index + 1) + '. ' + item.playerID + ': ' + item.score;
+                tupleElement.textContent = (i + 1) + '. ' + item.playerID + ': ' + item.score;
                 tupleElement.classList.add('leaderboard-tuple', 'animate-slide-in');
-                setTimeout(() => {
-                    leaderboardElement.appendChild(tupleElement);
-                }, 100 * index);
-            });
+                leaderboardElement.appendChild(tupleElement);
+            }
 
-            // Add a button to show more players
-            if (leaderboardData.length > 5) {
-                var showMoreButton = document.createElement('button');
-                showMoreButton.textContent = 'Show More';
-                showMoreButton.classList.add('button-85');
-                showMoreButton.onclick = function () {
-                    renderAllLeaderboard(leaderboardData);
+            // Add a button to show more or less players
+            if (leaderboardData.length > maxToShow) {
+                var toggleButton = document.createElement('button');
+                toggleButton.textContent = 'Show More';
+                toggleButton.classList.add('button-85');
+                toggleButton.onclick = function () {
+                    if (toggleButton.textContent === 'Show More') {
+                        renderAllLeaderboard(leaderboardData);
+                        toggleButton.textContent = 'Show Less';
+                    } else {
+                        renderLeaderboard(leaderboardData);
+                        toggleButton.textContent = 'Show More';
+                    }
                 };
-                leaderboardElement.appendChild(showMoreButton);
+                leaderboardElement.appendChild(toggleButton);
             }
         }
 
@@ -394,10 +401,16 @@
                     leaderboardElement.appendChild(tupleElement);
                 }, 100 * index);
             });
+
+            // Add a button to show less players
+            var showLessButton = document.createElement('button');
+            showLessButton.textContent = 'Show Less';
+            showLessButton.classList.add('button-85');
+            showLessButton.onclick = function () {
+                renderLeaderboard(leaderboardData.slice(0, 5));
+            };
+            leaderboardElement.appendChild(showLessButton);
         }
-
-
-
 
         // Call the retrieveLeaderboard function to initiate the retrieval process
         retrieveLeaderboard();
