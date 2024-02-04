@@ -5,3 +5,7 @@
 * Testing images:-
 
 <img src="./Images/Test2.png" alt="Test2"/>
+
+# Important Note
+* Do not select player vs player as it doesn't works properly it is under devlopment. You can play player vs cpu till then.
+* Enjoy!!.
