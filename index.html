@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe</title>
+    <style>
+        * {
+            background-color: black;
+            color: white;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #ffffff;
+            font-size: 100px;
+            margin-bottom: 20px;
+            margin-top: 50px;
+        }
+
+        p {
+            color: #ffffff;
+            line-height: 1.6;
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+
+        .content {
+            flex: 1;
+            padding-right: 20px;
+        }
+
+        .tic-tac-toe-image {
+            display: block;
+            margin: 0 auto;
+            width: 200px;
+            height: auto;
+        }
+
+        .game-mode-buttons {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .game-mode-buttons button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            background-color: #333333;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .game-mode-buttons button:hover {
+            background-color: #555555;
+        }
+
+        .model-container {
+            width: 300px;
+            height: 300px;
+            background-color: #333333;
+            /* Placeholder color */
+            border-radius: 10px;
+        }
+
+        @media (max-width: 768px) {
+            h1{
+                font-size: 55px;
+            }
+
+            p{
+                font-size: 17px;
+            }
+
+            .container {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .content {
+                padding-right: 0;
+            }
+
+            .tic-tac-toe-image {
+                width: 150px;
+            }
+
+            .model-container {
+                margin-top: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1 align="center">Tic Tac Toe</h1>
+    <div class="container">
+        <div class="content">
+            <p>Tic Tac Toe is a classic game played by two players, traditionally using X and O symbols on a 3x3 grid.
+                The
+                objective is to be the first player to form a horizontal, vertical, or diagonal line with their symbol.
+            </p>
+            <p>The game is simple yet challenging and is often used to teach basic strategy and critical thinking
+                skills.
+                It's popular among all age groups and can be played both casually and competitively.</p>
+            <p>With its straightforward rules and quick gameplay, Tic Tac Toe remains a timeless favorite in the world
+                of
+                games and puzzles.</p>
+            <br />
+            <br />
+            <br />
+        </div>
+        <div class="model-container">
+            <model-viewer src="./3d models/tic_tac_toe.glb" alt="Your 3D Model" auto-rotate camera-controls></model-viewer>
+        </div>
+
+    </div>
+    <br/>
+    <br/>
+    <br/>
+    <h3 align="center">Wanna Play choose any one!!</h3>
+    <div class="game-mode-buttons">
+        <button onclick="startGame('playerVsPlayer')">Player vs Player</button>
+        <button onclick="startGame('playerVsCPU')">Player vs CPU</button>
+    </div>
+
+    <script>
+        function startGame(mode) {
+            if (mode === 'playerVsPlayer') {
+                // Redirect to player vs player game page
+                window.location.href = './player vs player/index.html';
+            } else if (mode === 'playerVsCPU') {
+                // Redirect to player vs CPU game page
+                window.location.href = './player vs cpu/index.html';
+            }
+        }
+    </script>
+</body>
+
+</html>
