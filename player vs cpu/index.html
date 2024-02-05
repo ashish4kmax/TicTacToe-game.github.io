@@ -456,17 +456,19 @@
                 document.getElementById(select + 1).innerHTML = matrix[select];
                 check(currentPlayer);
 
-                if (count < 9) {
+                if (!isGameFinished()) { // Check if the game is finished
                     currentPlayer = (currentPlayer === player) ? cpu : player; // Switch player turn
                     if (currentPlayer === cpu) {
                         isCPUMove = true; // Disable player's move
-                        setTimeout(cpuMove, 500); // Delay CPU move by 1.5 seconds
+                        setTimeout(cpuMove, 500); // Delay CPU move by 0.5 seconds
                     }
                 }
             }
         }
 
         function cpuMove() {
+            if (isGameFinished()) return; // Check if the game is finished before CPU moves
+
             var randomIndex;
             do {
                 randomIndex = Math.floor(Math.random() * 9);
@@ -478,6 +480,10 @@
             check(cpu);
             currentPlayer = player; // Switch back to player's turn
             isCPUMove = false; // Enable player's move
+        }
+
+        function isGameFinished() {
+            return document.getElementById("result").innerHTML !== ""; // Check if the result is already set
         }
 
         function check(symbol) {
