@@ -279,11 +279,11 @@
         <p>Player1 :- <input type="text" name="" id="player1" placeholder="Enter player1's name" value=""></p>
         <!-- To create spacing -->
         &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-        <p>Player2 :- <input type="text" name="" id="player2" placeholder="CPU by default" value=""></p>
+        <p>Player2 :- <input type="text" name="" id="player2" placeholder="Enter player2's name" value=""></p>
         <br />
         <!-- To create spacing -->
         &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-        <button type="button" id="top-button" class="button-85" onclick="startGame()">Submit</button>
+        <button type="button" id="top-button" class="button-85" onclick="players()">Submit</button>
     </div>
     <h2 id="result"></h2>
     <div class="container">
@@ -318,6 +318,108 @@
         var player2 = "O";
         var currentPlayer = player1;
 
+        // Initially disable the grid items onclick event
+        disableGridItemClick();
+
+        // Initialize AWS
+        AWS.config.region = 'ap-south-1'; // Specify the AWS region
+        AWS.config.credentials = new AWS.Credentials('AKIAQHEPT6D4Y433AUCR', 'kPFRkaG9CWaQCck+jQxqGtVXWE/W6zwJxQjU0eLV'); // Specify your AWS credentials
+
+        var docClient = new AWS.DynamoDB.DocumentClient();
+
+        // Function to retrieve leaderboard data
+        function retrieveLeaderboard() {
+            var params = {
+                TableName: "Players_Leaderboard" // Specify the table name
+            };
+
+            docClient.scan(params, function (err, data) {
+                if (err) {
+                    console.error("Unable to retrieve leaderboard data. Error JSON:", JSON.stringify(err, null, 2));
+                } else {
+                    console.log("Leaderboard data:", data);
+                    renderLeaderboard(data.Items); // Call a function to render the leaderboard UI with the retrieved data
+                }
+            });
+        }
+
+        // Function to render the leaderboard UI with the retrieved data
+        function renderLeaderboard(leaderboardData) {
+            var leaderboardElement = document.querySelector('.leaderboard');
+            leaderboardElement.innerHTML = '<h3>Leaderboard</h3>';
+
+            // Sort the leaderboardData array based on the score in descending order
+            leaderboardData.sort((a, b) => b.score - a.score);
+
+            // Clear the leaderboard content
+            leaderboardElement.innerHTML = '';
+
+            // Loop through the sorted leaderboardData array and render each item with animation
+            var maxToShow = 5;
+            for (var i = 0; i < maxToShow; i++) {
+                var item = leaderboardData[i];
+                if (!item) break;
+                var tupleElement = document.createElement('p');
+                tupleElement.textContent = (i + 1) + '. ' + item.playerID + ': ' + item.score;
+                tupleElement.classList.add('leaderboard-tuple', 'animate-slide-in');
+                leaderboardElement.appendChild(tupleElement);
+            }
+
+            // Add a button to show more or less players
+            if (leaderboardData.length > maxToShow) {
+                var toggleButton = document.createElement('button');
+                toggleButton.textContent = 'Show More';
+                toggleButton.classList.add('button-85');
+                toggleButton.onclick = function () {
+                    if (toggleButton.textContent === 'Show More') {
+                        renderAllLeaderboard(leaderboardData);
+                        toggleButton.textContent = 'Show Less';
+                    } else {
+                        renderLeaderboard(leaderboardData);
+                        toggleButton.textContent = 'Show More';
+                    }
+                };
+                leaderboardElement.appendChild(toggleButton);
+            }
+        }
+
+        // Function to render all leaderboard items
+        function renderAllLeaderboard(leaderboardData) {
+            var leaderboardElement = document.querySelector('.leaderboard');
+            leaderboardElement.innerHTML = '<h3>Leaderboard</h3>';
+
+            // Sort the leaderboardData array based on the score in descending order
+            leaderboardData.sort((a, b) => b.score - a.score);
+
+            // Loop through the sorted leaderboardData array and render each item with animation
+            leaderboardData.forEach(function (item, index) {
+                var tupleElement = document.createElement('p');
+                tupleElement.textContent = (index + 1) + '. ' + item.playerID + ': ' + item.score;
+                tupleElement.classList.add('leaderboard-tuple', 'animate-slide-in');
+                setTimeout(() => {
+                    leaderboardElement.appendChild(tupleElement);
+                }, 100 * index);
+            });
+
+            // Add a button to show less players
+            var showLessButton = document.createElement('button');
+            showLessButton.textContent = 'Show Less';
+            showLessButton.classList.add('button-85');
+            showLessButton.onclick = function () {
+                renderLeaderboard(leaderboardData.slice(0, 5));
+            };
+            leaderboardElement.appendChild(showLessButton);
+        }
+
+        // Call the retrieveLeaderboard function to initiate the retrieval process
+        retrieveLeaderboard();
+
+        // Check if DynamoDB is correctly configured
+        if (!AWS.config.credentials || !AWS.config.region) {
+            console.error("AWS credentials or region not configured properly.");
+        }
+
+
         function disableGridItemClick() {
             var gridItems = document.getElementsByClassName("grid-item");
             for (var i = 0; i < gridItems.length; i++) {
@@ -332,6 +434,21 @@
             }
         }
 
+        function players() {
+            var player1Name = document.getElementById('player1').value;
+            var player2Name = document.getElementById('player2').value;
+
+            if (player1Name.trim() !== "" && player2Name.trim() !== "") {
+                enableGridItemClick();
+            } else {
+                alert("Please enter names for both players!!");
+            }
+        }
+
+        function reload() {
+            location.reload();
+        }
+
         function initialize(select) {
             if (matrix[select] != 'X' && matrix[select] != 'O') {
                 matrix[select] = currentPlayer;
@@ -339,8 +456,9 @@
                 document.getElementById(select + 1).innerHTML = matrix[select];
                 check(currentPlayer);
 
-                // Switch to the next player
-                currentPlayer = (currentPlayer === player1) ? player2 : player1;
+                if (!isGameFinished()) {
+                    currentPlayer = (currentPlayer === "X") ? "O" : "X";
+                }
             }
         }
 
@@ -355,7 +473,8 @@
                     (matrix[0] == symbol && matrix[4] == symbol && matrix[8] == symbol) ||
                     (matrix[2] == symbol && matrix[4] == symbol && matrix[6] == symbol)) {
                     var playerName = (symbol == 'X') ? document.getElementById('player1').value : document.getElementById('player2').value;
-                    document.getElementById("result").innerHTML = playerName + ' wins!!';
+                    checkAndUpdateLeaderboard(symbol, playerName);
+                    document.getElementById("result").innerHTML = (symbol == 'X') ? (document.getElementById('player1').value + ' wins!!') : (document.getElementById('player2').value + ' wins!!');
                     setTimeout(function () {
                         window.location.reload();
                     }, 2000);
@@ -368,19 +487,77 @@
             }
         }
 
-        function startGame() {
-            var player1Name = document.getElementById('player1').value;
-            var player2Name = document.getElementById('player2').value;
+        function cpuMove() {
+            if (isGameFinished()) return; // Check if the game is finished before CPU moves
 
-            if (player1Name.trim() !== "" && player2Name.trim() !== "") {
-                enableGridItemClick();
-            } else {
-                alert("Please enter names for both players!");
+            var randomIndex;
+            do {
+                randomIndex = Math.floor(Math.random() * 9);
+            } while (matrix[randomIndex] === 'X' || matrix[randomIndex] === 'O');
+
+            matrix[randomIndex] = cpu;
+            count++;
+            document.getElementById(randomIndex + 1).innerHTML = matrix[randomIndex];
+            check(cpu);
+            currentPlayer = player; // Switch back to player's turn
+            isCPUMove = false; // Enable player's move
+        }
+
+        function isGameFinished() {
+            return document.getElementById("result").innerHTML !== ""; // Check if the result is already set
+        }
+
+        function check(symbol) {
+            if (count >= 5) {
+                if ((matrix[0] == symbol && matrix[1] == symbol && matrix[2] == symbol) ||
+                    (matrix[3] == symbol && matrix[4] == symbol && matrix[5] == symbol) ||
+                    (matrix[6] == symbol && matrix[7] == symbol && matrix[8] == symbol) ||
+                    (matrix[0] == symbol && matrix[3] == symbol && matrix[6] == symbol) ||
+                    (matrix[1] == symbol && matrix[4] == symbol && matrix[7] == symbol) ||
+                    (matrix[2] == symbol && matrix[5] == symbol && matrix[8] == symbol) ||
+                    (matrix[0] == symbol && matrix[4] == symbol && matrix[8] == symbol) ||
+                    (matrix[2] == symbol && matrix[4] == symbol && matrix[6] == symbol)) {
+                    var playerName = (symbol == 'X') ? document.getElementById('player1').value : document.getElementById('player2').value;
+                    checkAndUpdateLeaderboard(symbol, playerName);
+                    document.getElementById("result").innerHTML = (symbol == 'X') ? (document.getElementById('player1').value + ' wins!!') : (document.getElementById('player2').value + ' wins!!');
+                    setTimeout(function () {
+                        window.location.reload();
+                    }, 2000);
+                } else if (count == 9) {
+                    document.getElementById("result").innerHTML = "DRAW";
+                    setTimeout(function () {
+                        window.location.reload();
+                    }, 2000);
+                }
             }
         }
+
+        function checkAndUpdateLeaderboard(symbol, playerName) {
+            var params = {
+                TableName: "Players_Leaderboard",
+                Key: {
+                    "playerID": playerName
+                },
+                UpdateExpression: "SET #s = if_not_exists(#s, :zero) + :inc",
+                ExpressionAttributeNames: {
+                    "#s": "score"
+                },
+                ExpressionAttributeValues: {
+                    ":inc": 1,
+                    ":zero": 0
+                },
+                ReturnValues: "UPDATED_NEW"
+            };
+
+            docClient.update(params, function (err, data) {
+                if (err) {
+                    console.error("Unable to update item. Error JSON:", JSON.stringify(err, null, 2));
+                } else {
+                    console.log("UpdateItem succeeded:", JSON.stringify(data, null, 2));
+                }
+            });
+        }
     </script>
-
-
 </body>
 
 </html>
